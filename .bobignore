@@ -1,0 +1,27 @@
+# .bobignore template — copy to the target repo root as `.bobignore`
+# Controls which files Bob can access. Tune per repository.
+
+# Secrets and credentials
+.env
+.env.*
+*.pem
+*.key
+credentials*.json
+secrets/
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+coverage/
+*.log
+
+# Production data and dumps
+*.sql
+*.dump
+data/production/
+
+# OS / editor noise
+.DS_Store
+.idea/
+.vscode/
