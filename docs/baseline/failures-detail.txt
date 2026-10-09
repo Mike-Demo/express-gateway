@@ -1,0 +1,201 @@
+﻿=== FAILURE ERROR GROUPS ===
+56 | Not Found
+9 | expected 200 "OK", got 502 "Bad Gateway"
+9 | crypto.createCipher is not a function
+8 | expected TypeError { message: 'crypto.createCipher is not a function' } to not e
+7 | Cannot convert undefined or null to object
+4 | error:0A00018F:SSL routines::ee key too small
+4 | expected 200 "OK", got 500 "Internal Server Error"
+4 | Cannot read properties of undefined (reading 'split')
+4 | Cannot read properties of undefined (reading 'refresh_token')
+2 | expected [Promise] to be fulfilled, but it was rejected with Error {
+  status: 4
+2 | expected 200 "OK", got 400 "Bad Request"
+2 | expected Object {
+  'x-powered-by': 'Express',
+  'r-test': 'baffino',
+  'x-test'
+2 | Cannot read properties of undefined (reading 'id')
+2 | expected TypeError {
+  message: 'Cannot read properties of null (reading \'shoul
+2 | expected Error {
+  operator: 'to equal',
+  expected: undefined,
+  details: '',
+ 
+1 | expected '' to contain 'ECONNREFUSED'
+1 | getaddrinfo ENOTFOUND fe80
+1 | expected Error {
+  message: 'expected 200 "OK", got 500 "Internal Server Error"'
+1 | ECONNREFUSED: Connection refused
+1 | spawn EINVAL
+1 | expected 302 "Found", got 500 "Internal Server Error"
+1 | Cannot read properties of undefined (reading 'close')
+1 | expected 502 "Bad Gateway", got 500 "Internal Server Error"
+1 | expected [Promise] to be rejected: expected Error {
+  status: 404,
+  response: R
+1 | expected false == true
+
+=== ALL FAILURES ===
+1|eg apps activate "before each" hook for "activates an app"|Not Found
+2|eg apps create "before each" hook for "creates an app from prompts with username"|Not Found
+3|eg apps deactivate "before each" hook for "deactivates an app"|Not Found
+4|eg apps info "before all" hook for "returns app info"|Not Found
+5|eg apps list "before each" hook for "should show apps list"|Not Found
+6|eg apps remove "before each" hook for "removes an app"|Not Found
+7|eg apps update "before each" hook for "updates an app from prompts"|Not Found
+8|eg credential:scopes add "before each" hook for "adds scope to a credential"|Not Found
+9|eg credential:scopes remove "before each" hook for "remove-scopes from a credential"|Not Found
+10|eg credential:scopes set "before each" hook for "sets scopes to a credential"|Not Found
+11|eg credentials activate "before each" hook for "activates a credential"|Not Found
+12|eg credentials create "before each" hook for "creates a credential from prompts"|Not Found
+13|eg credentials deactivate "before each" hook for "deactivates a credential"|Not Found
+14|eg credentials info "before each" hook for "returns cred info"|Not Found
+15|eg credentials list -c x [no credentials] "before each" hook for "should show friendly message if no credentials"|Not Found
+16|eg credentials list "before all" hook for "should have the id property, but not the secret ones"|Not Found
+17|eg scopes create creates a scope from prompts|Not Found
+18|eg scopes create prints only the scope name when using the --quiet flag|Not Found
+19|eg scopes info "before each" hook for "should show scope info"|Not Found
+20|eg scopes list "before each" hook for "should show scopes list"|Not Found
+21|eg scopes remove "before each" hook for "should rm scope"|Not Found
+22|eg tokens revoke "before each" hook for "revokes token"|Not Found
+23|eg users activate "before each" hook for "activates a user by username"|Not Found
+24|eg users create creates a user from prompts|Not Found
+25|eg users create creates a user from properties|Not Found
+26|eg users create creates a user from stdin|Not Found
+27|eg users create prints only the user id when using the --quiet flag|Not Found
+28|eg users deactivate "before each" hook for "deactivates a user by username"|Not Found
+29|eg users info "before each" hook for "returns user info"|Not Found
+30|eg users list "before each" hook for "should show users list"|Not Found
+31|eg users remove "before each" hook for "removes a user by username"|Not Found
+32|eg users update "before each" hook for "updates a user from prompts by username"|Not Found
+33|conditions jsonSchema with a remote schema should match if the body matches the schema|expected [Promise] to be fulfilled, but it was rejected with Error {
+  status: 404,
+  response: Response {
+    _events: 
+34|conditions jsonSchema with a remote schema should not match if the body does not matches the schema|expected [Promise] to be fulfilled, but it was rejected with Error {
+  status: 404,
+  response: Response {
+    _events: 
+35|hostname should not answer on localhost|expected '' to contain 'ECONNREFUSED'
+36|hostname should answer on the provided interface|getaddrinfo ENOTFOUND fe80
+37|sni sni should connect to a.example.com but fail to verify client chain (ca1 issuer is not known to server)|error:0A00018F:SSL routines::ee key too small
+38|sni sni should connect to a.example.com and authorize client because agent4 is issued by ca2, allowed by server|error:0A00018F:SSL routines::ee key too small
+39|sni sni should connect to b.example.com|error:0A00018F:SSL routines::ee key too small
+40|sni sni should fail to connect to c.another.com (not defined in EG config)|error:0A00018F:SSL routines::ee key too small
+41|Functional Test Authorization Code grant should grant access token if requesting without scopes|Cannot convert undefined or null to object
+42|Functional Test Authorization Code grant should grant access token if requesting with scopes and scopes are authorized|Cannot convert undefined or null to object
+43|Functional Test Authorization Code grant should grant access token in exchange of refresh token|expected 200 "OK", got 400 "Bad Request"
+44|Functional Test Authorization Code grant should not grant access token if consumer is not authorized to requested scopes|Cannot convert undefined or null to object
+45|Functional Test Authorization Code grant should not grant access token if code is expired|Cannot convert undefined or null to object
+46|Functional Test Client Credentials grant should grant access token for requests without scopes|expected 200 "OK", got 500 "Internal Server Error"
+47|Functional Test Client Credentials grant should grant access token for requests with authorized scopes|expected Error {
+  message: 'expected 200 "OK", got 500 "Internal Server Error"'
+} to not exist
+48|Functional Test Implicit grant should grant access token when requesting without scopes|Cannot convert undefined or null to object
+49|Functional Test Implicit grant should grant access token with requesting with scopes and scopes are authorized|Cannot convert undefined or null to object
+50|Functional Test Implicit grant should not grant access token with requesting with scopes and scopes are unauthorized|Cannot convert undefined or null to object
+51|Functional Test Client Password grant should grant access token when no scopes are specified|expected 200 "OK", got 500 "Internal Server Error"
+52|Functional Test Client Password grant should grant access token with authorized scopes|expected 200 "OK", got 500 "Internal Server Error"
+53|Functional Test Client Password grant should grant access token in exchange of refresh token|expected 200 "OK", got 400 "Bad Request"
+54|admin with plugins should add custom route|ECONNREFUSED: Connection refused
+55|PluginInstaller#runNPMInstallation installs an package using a file-system package specifier|spawn EINVAL
+56|@modifier policy headers and responses modification should correctly reshape the request and response|expected Object {
+  'x-powered-by': 'Express',
+  'r-test': 'baffino',
+  'x-test': 'hello',
+  'content-type': 'applicatio
+57|@modifier policy headers and responses modification should correctly reshape the request and response with url encoded payload|expected Object {
+  'x-powered-by': 'Express',
+  'r-test': 'baffino',
+  'x-test': 'hello',
+  'content-type': 'applicatio
+58|Request @headers @proxy downstream @auth @key-auth "before all" hook: setup for "should authenticate token for requests with scopes if requester is authorized"|expected 302 "Found", got 500 "Internal Server Error"
+59|Request @headers @proxy downstream @auth @key-auth "after all" hook: cleanup for "should authenticate token for requests with scopes if requester is authorized"|Cannot read properties of undefined (reading 'close')
+60|Functional Tests oAuth2.0 Policy "before all" hook: setup for "should not authenticate token for requests without token header"|expected 200 "OK", got 500 "Internal Server Error"
+61|@proxy policy proxyOptions when incorrect proxy options are provided responds with a bad gateway error|expected 502 "Bad Gateway", got 500 "Internal Server Error"
+62|@proxy policy proxyOptions When proxy options are specified on the policy action passes options to proxy|expected 200 "OK", got 502 "Bad Gateway"
+63|@proxy policy proxyOptions When proxy options are specified on the serviceEndpoint passes options to proxy|expected 200 "OK", got 502 "Bad Gateway"
+64|@proxy policy proxyOptions When proxy options are scattered on all the supported properties passes options to proxy|expected 200 "OK", got 502 "Bad Gateway"
+65|@proxy policy requestStream property should return a different body when requestStream is set|expected 200 "OK", got 502 "Bad Gateway"
+66|@proxy policy strip Path capabilities should be proxied with all the query parameters when hitting a star path|expected 200 "OK", got 502 "Bad Gateway"
+67|@proxy policy strip Path capabilities should be proxied with all the query parameters when hitting a normal path|expected 200 "OK", got 502 "Bad Gateway"
+68|@proxy policy strip Path capabilities should be proxied without URL decoding the path|expected 200 "OK", got 502 "Bad Gateway"
+69|@proxy policy strip Path capabilities should be proxied stripping path up to first wildcard|expected 200 "OK", got 502 "Bad Gateway"
+70|@proxy policy strip Path capabilities endpoint* and endpoint/* should be equivalent|expected 200 "OK", got 502 "Bad Gateway"
+71|REST: api endpoints when no api endpoints defined should create a new api endpoint|Not Found
+72|REST: api endpoints when api endpoints defined should create a new api endpoint|Not Found
+73|REST: api endpoints when api endpoints defined should update existing endpoint|Not Found
+74|REST: api endpoints when api endpoints defined should delete existing endpoint|Not Found
+75|REST: api endpoints when api endpoints defined should show existing endpoint|Not Found
+76|REST: api endpoints when api endpoints defined should list all endpoints|Not Found
+77|REST: pipelines when no pipelines defined should create a new pipeline|Not Found
+78|REST: pipelines when pipelines defined should create a new pipeline|Not Found
+79|REST: pipelines when pipelines defined should update existing pipeline|Not Found
+80|REST: pipelines when pipelines defined should refuse a misconfigured policy in a pipeline|expected [Promise] to be rejected: expected Error {
+  status: 404,
+  response: Response {
+    _events: {},
+    _eventsCo
+81|REST: pipelines when pipelines defined should delete existing pipeline|Not Found
+82|REST: pipelines when pipelines defined should show existing pipeline|Not Found
+83|REST: pipelines when pipelines defined should list all pipelines|Not Found
+84|REST: policies when no policies defined should activate new policy|Not Found
+85|REST: policies when policies defined should create a new api endpoint|Not Found
+86|REST: policies when policies defined should deactivate existing policy|Not Found
+87|REST: policies when policies defined should list all enabled policies|Not Found
+88|REST: schemas when policies defined should list all policy schemas|Not Found
+89|REST: schemas when policies defined should find basic-auth policy|Not Found
+90|REST: service endpoints when no service endpoints defined should create a new service endpoint|Not Found
+91|REST: service endpoints when service endpoints defined should create a new service endpoint|Not Found
+92|REST: service endpoints when service endpoints defined should update existing endpoint|Not Found
+93|REST: service endpoints when service endpoints defined should delete existing endpoint|Not Found
+94|REST: service endpoints when service endpoints defined should show existing endpoint|Not Found
+95|REST: service endpoints when service endpoints defined should list all endpoints|Not Found
+96|Auth tests Token Auth "before all" hook for "should authenticate token"|crypto.createCipher is not a function
+97|Authorization Code Tests should save a code|expected false == true
+98|Authorization Code Tests should find a code|Cannot read properties of undefined (reading 'id')
+99|Authorization Code Tests should not find a code the second time|Cannot read properties of undefined (reading 'id')
+100|Access Token tests Save, Find and Get Access Token tests should save an access token|crypto.createCipher is not a function
+101|Access Token tests Save, Find and Get Access Token tests should find an access token|expected TypeError {
+  message: 'Cannot read properties of null (reading \'should\')'
+} to not exist
+102|Access Token tests Save, Find and Get Access Token tests should get an access token|Cannot read properties of undefined (reading 'split')
+103|Access Token tests Save, Find and Get Access Token tests should not create a new access token if one exists and is not expired|expected TypeError { message: 'crypto.createCipher is not a function' } to not exist
+104|Access Token tests Save, Find and Get Access Token tests should save an access token with scopes|crypto.createCipher is not a function
+105|Access Token tests Save, Find and Get Access Token tests should find an access token with scopes|expected TypeError {
+  message: 'Cannot read properties of null (reading \'should\')'
+} to not exist
+106|Access Token tests Save, Find and Get Access Token tests should get an access token with scopes|Cannot read properties of undefined (reading 'split')
+107|Access Token tests Save, Find and Get Access Token tests should not create a new access token with scopes if one exists and is not expired|expected TypeError { message: 'crypto.createCipher is not a function' } to not exist
+108|Access Token tests Archive Access Token tests should save an access token|crypto.createCipher is not a function
+109|Access Token tests Archive Access Token tests should not get an expired access token if not using the includeExpired flag|Cannot read properties of undefined (reading 'split')
+110|Access Token tests Archive Access Token tests should create a new access token if one is expired|expected TypeError { message: 'crypto.createCipher is not a function' } to not exist
+111|Access Token tests Archive Access Token tests should get an expired access token with includeExpired flag|Cannot read properties of undefined (reading 'split')
+112|Access Token tests Get Access Tokens By Consumer "before all" hook for "should get active access tokens by consumer"|crypto.createCipher is not a function
+113|Refresh Token tests Save, Find and Get Refresh Token tests should save a refresh token along with access token|crypto.createCipher is not a function
+114|Refresh Token tests Save, Find and Get Refresh Token tests should find a refresh token along with access token|expected Error {
+  operator: 'to equal',
+  expected: undefined,
+  details: '',
+  showDiff: false,
+  actual: Object { acc
+115|Refresh Token tests Save, Find and Get Refresh Token tests should get refresh token's original token Obj|Cannot read properties of undefined (reading 'refresh_token')
+116|Refresh Token tests Save, Find and Get Refresh Token tests should get a refresh token|Cannot read properties of undefined (reading 'refresh_token')
+117|Refresh Token tests Save, Find and Get Refresh Token tests should not create a new refresh token if one exists and is not expired|expected TypeError { message: 'crypto.createCipher is not a function' } to not exist
+118|Refresh Token tests Save, Find and Get Refresh Token tests should save a refresh token with scopes, along with an access token|crypto.createCipher is not a function
+119|Refresh Token tests Save, Find and Get Refresh Token tests should find a refresh token with scopes|expected Error {
+  operator: 'to equal',
+  expected: undefined,
+  details: '',
+  showDiff: false,
+  actual: Object { acc
+120|Refresh Token tests Save, Find and Get Refresh Token tests should get a refresh token with scopes|Cannot read properties of undefined (reading 'refresh_token')
+121|Refresh Token tests Save, Find and Get Refresh Token tests should not create a new refresh token with scopes if one exists and is not expired|expected TypeError { message: 'crypto.createCipher is not a function' } to not exist
+122|Refresh Token tests Archive Refresh Token tests should save a refresh token|crypto.createCipher is not a function
+123|Refresh Token tests Archive Refresh Token tests should create a new refresh token if one is expired|expected TypeError { message: 'crypto.createCipher is not a function' } to not exist
+124|Refresh Token tests Archive Refresh Token tests should not create a new refresh token if one is not expired, even if the access token is expired|expected TypeError { message: 'crypto.createCipher is not a function' } to not exist
+125|Refresh Token tests Archive Refresh Token tests should create a new refresh token if one does not exist, even if the access token is exists|expected TypeError { message: 'crypto.createCipher is not a function' } to not exist
+126|Refresh Token tests Archive Refresh Token tests should find an expired refresh token with includeExpired flag|Cannot read properties of undefined (reading 'refresh_token')
+127|Refresh Token tests Get Refresh Tokens By Consumer "before all" hook|crypto.createCipher is not a function
