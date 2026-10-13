@@ -95,6 +95,26 @@ Expected: unit+policy passing ≥ 357, failing ≤ 63; characterization 31/0.
 
 ---
 
+## Redis key formats scanned
+
+The migration script enumerates keys in exactly the two namespaces written by
+`lib/services/tokens/token.dao.js`:
+
+| Token type    | Redis key pattern                          |
+|---------------|--------------------------------------------|
+| Access token  | `${namespace}-access-token:<token-id>`     |
+| Refresh token | `${namespace}-refresh-token:<token-id>`    |
+
+Where `${namespace}` defaults to `EG` (the `db.redis.namespace` value in
+`system.config.yml`). The script uses a hyphen (`-`) as the separator between
+the namespace and the token type, matching the DAO exactly.
+
+> **Note:** An earlier version of the script scanned using the pattern
+> `${namespace}:*` (colon separator). That pattern matched none of the real
+> token keys and has been corrected to use the patterns listed above.
+
+---
+
 ## Rollback procedure
 
 If migration errors occur or post-upgrade tests regress:
