@@ -1,0 +1,29 @@
+# Demo deployment image - runs THIS repository's modernized source code.
+#
+# The root Dockerfile is the upstream distribution image: it installs the
+# published express-gateway package from npm (yarn global add
+# express-gateway@$EG_VERSION) and would NOT serve the modernized code in
+# this repo. This Dockerfile.demo exists so the live demo runs the actual
+# submission code on Node 22.
+FROM node:22-alpine
+
+WORKDIR /app
+
+ENV NODE_ENV=production \
+    EG_CONFIG_DIR=/app/lib/config \
+    EG_DISABLE_CONFIG_WATCH=true \
+    EG_HTTP_PORT=8080
+
+# Production dependencies only. ioredis-mock is a production dependency of
+# this project, so the built-in Redis emulation (EG_DB_EMULATE defaults to
+# true) works with no external Redis service.
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+
+COPY lib ./lib
+
+EXPOSE 8080
+
+# Same entry pattern as the upstream distribution image, pointed at the
+# local source instead of the npm package.
+CMD ["node", "-e", "require('/app/lib')().run();"]
