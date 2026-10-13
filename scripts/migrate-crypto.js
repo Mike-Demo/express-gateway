@@ -73,6 +73,15 @@ function decryptLegacy (hexCiphertext, cipherKey) {
   return decipher.update(hexCiphertext, 'hex', 'utf8') + decipher.final('utf8');
 }
 
+// ── Legacy encrypt (AES-256-CBC via EVP_BytesToKey) ───────────────────────────
+// Used only by tests to seed legacy-format records into Redis.
+
+function encryptLegacy (plaintext, cipherKey) {
+  const { key, iv } = evpBytesToKey(cipherKey, 32, 16);
+  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+  return cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
+}
+
 // ── New encrypt (AES-256-GCM) ─────────────────────────────────────────────────
 
 function encryptNew (plaintext, cipherKey, scryptSalt) {
@@ -104,12 +113,52 @@ function isNewScheme (value) {
   return typeof value === 'string' && value.split(':').length === 3;
 }
 
-// ── Scan + process ────────────────────────────────────────────────────────────
+// ── Key patterns matching the DAO's actual format ────────────────────────────
+// token.dao.js stores token records as:
+//   ${namespace}-access-token:<id>    (dao.js line 24)
+//   ${namespace}-refresh-token:<id>   (dao.js line 29)
+// The patterns below enumerate both token key spaces.
 
-async function run () {
-  const { cipherKey, scryptSalt } = config.systemConfig.crypto;
+function tokenKeyPatterns (namespace) {
+  return [
+    `${namespace}-access-token:*`,
+    `${namespace}-refresh-token:*`
+  ];
+}
 
+async function scanPattern (pattern, redisClient) {
+  const keys = [];
   let cursor = '0';
+  do {
+    const [nextCursor, batch] = await redisClient.scan(cursor, 'MATCH', pattern, 'COUNT', 100);
+    cursor = nextCursor;
+    keys.push(...batch);
+  } while (cursor !== '0');
+  return keys;
+}
+
+// ── Core migration logic (exported for testing) ───────────────────────────────
+
+/**
+ * Runs the migration over the given Redis client.
+ *
+ * @param {object} opts
+ * @param {object} opts.redisClient   - ioredis (or ioredis-mock) client
+ * @param {string} opts.cipherKey     - cipher key for encrypt/decrypt
+ * @param {string} [opts.scryptSalt]  - scrypt salt (defaults to SCRYPT_SALT_DEFAULT)
+ * @param {string} [opts.namespace]   - Redis namespace (default: 'EG')
+ * @param {boolean} [opts.dryRun]     - dry-run mode
+ * @param {boolean} [opts.verify]     - verify mode
+ * @returns {Promise<{totalKeys, legacyFound, migrated, alreadyNew, errored, errors}>}
+ */
+async function migrate (opts) {
+  const redisClient = opts.redisClient || db;
+  const cipherKey = opts.cipherKey;
+  const scryptSalt = opts.scryptSalt;
+  const namespace = opts.namespace || 'EG';
+  const dryRun = !!opts.dryRun;
+  const verify = !!opts.verify;
+
   let totalKeys = 0;
   let legacyFound = 0;
   let migrated = 0;
@@ -117,78 +166,86 @@ async function run () {
   let errored = 0;
   const errors = [];
 
-  console.log(`[migrate-crypto] mode=${DRY_RUN ? 'dry-run' : VERIFY ? 'verify' : 'migrate'} namespace=${NAMESPACE}`);
-  console.log(`[migrate-crypto] scanning Redis for keys matching ${NAMESPACE}:*`);
+  const patterns = tokenKeyPatterns(namespace);
+  const allKeys = (await Promise.all(patterns.map(p => scanPattern(p, redisClient)))).flat();
 
-  do {
-    const [nextCursor, keys] = await db.scan(cursor, 'MATCH', `${NAMESPACE}:*`, 'COUNT', 100);
-    cursor = nextCursor;
+  for (const key of allKeys) {
+    totalKeys++;
+    const type = await redisClient.type(key);
+    if (type !== 'hash') continue;
 
-    for (const key of keys) {
-      totalKeys++;
-      const type = await db.type(key);
-      if (type !== 'hash') continue;
+    const hash = await redisClient.hgetall(key);
+    if (!hash) continue;
 
-      const hash = await db.hgetall(key);
-      if (!hash) continue;
+    for (const field of ENCRYPTED_FIELDS) {
+      const value = hash[field];
+      if (!value) continue;
 
-      for (const field of ENCRYPTED_FIELDS) {
-        const value = hash[field];
-        if (!value) continue;
-
-        if (VERIFY) {
-          // Verify mode: confirm new-scheme records decrypt correctly.
-          if (!isNewScheme(value)) {
-            if (isLegacy(value)) {
-              const msg = `VERIFY FAIL: ${key}[${field}] still has legacy ciphertext`;
-              console.error(msg);
-              errors.push(msg);
-              errored++;
-            }
-            continue;
-          }
-          try {
-            decryptNew(value, cipherKey, scryptSalt);
-            alreadyNew++;
-          } catch (err) {
-            const msg = `VERIFY FAIL: ${key}[${field}] — ${err.message}`;
-            console.error(msg);
-            errors.push(msg);
+      if (verify) {
+        if (!isNewScheme(value)) {
+          if (isLegacy(value)) {
+            errors.push(`VERIFY FAIL: ${key}[${field}] still has legacy ciphertext`);
             errored++;
           }
           continue;
         }
-
-        if (isLegacy(value)) {
-          legacyFound++;
-          console.log(`[migrate-crypto] LEGACY: ${key}[${field}]`);
-
-          let plaintext;
-          try {
-            plaintext = decryptLegacy(value, cipherKey);
-          } catch (err) {
-            const msg = `CANNOT_DECRYPT: ${key}[${field}] — ${err.message}`;
-            console.error(`[migrate-crypto] ${msg}`);
-            errors.push(msg);
-            errored++;
-            continue; // never silently overwrite a record that failed decryption
-          }
-
-          if (DRY_RUN) {
-            console.log(`[migrate-crypto] DRY-RUN: would migrate ${key}[${field}]`);
-            migrated++;
-          } else {
-            const newCiphertext = encryptNew(plaintext, cipherKey, scryptSalt);
-            await db.hset(key, field, newCiphertext);
-            console.log(`[migrate-crypto] MIGRATED: ${key}[${field}]`);
-            migrated++;
-          }
-        } else if (isNewScheme(value)) {
+        try {
+          decryptNew(value, cipherKey, scryptSalt);
           alreadyNew++;
+        } catch (err) {
+          errors.push(`VERIFY FAIL: ${key}[${field}] — ${err.message}`);
+          errored++;
         }
+        continue;
+      }
+
+      if (isLegacy(value)) {
+        legacyFound++;
+
+        let plaintext;
+        try {
+          plaintext = decryptLegacy(value, cipherKey);
+        } catch (err) {
+          errors.push(`CANNOT_DECRYPT: ${key}[${field}] — ${err.message}`);
+          errored++;
+          continue;
+        }
+
+        if (dryRun) {
+          migrated++;
+        } else {
+          const newCiphertext = encryptNew(plaintext, cipherKey, scryptSalt);
+          await redisClient.hset(key, field, newCiphertext);
+          migrated++;
+        }
+      } else if (isNewScheme(value)) {
+        alreadyNew++;
       }
     }
-  } while (cursor !== '0');
+  }
+
+  return { totalKeys, legacyFound, migrated, alreadyNew, errored, errors };
+}
+
+// ── CLI entry point ───────────────────────────────────────────────────────────
+
+async function run () {
+  const { cipherKey, scryptSalt } = config.systemConfig.crypto;
+
+  const patterns = tokenKeyPatterns(NAMESPACE);
+  console.log(`[migrate-crypto] mode=${DRY_RUN ? 'dry-run' : VERIFY ? 'verify' : 'migrate'} namespace=${NAMESPACE}`);
+  console.log(`[migrate-crypto] scanning Redis for keys matching: ${patterns.join(', ')}`);
+
+  const result = await migrate({
+    redisClient: db,
+    cipherKey,
+    scryptSalt,
+    namespace: NAMESPACE,
+    dryRun: DRY_RUN,
+    verify: VERIFY
+  });
+
+  const { totalKeys, legacyFound, migrated, alreadyNew, errored, errors } = result;
 
   console.log('');
   console.log('[migrate-crypto] ─────────────── SUMMARY ───────────────');
@@ -227,8 +284,22 @@ async function run () {
   await db.quit();
 }
 
-run().catch(err => {
-  console.error('[migrate-crypto] Fatal error:', err.message);
-  process.exitCode = 1;
-  db.quit().catch(() => {});
-});
+// Run as CLI when executed directly; export helpers for testing when required.
+if (require.main === module) {
+  run().catch(err => {
+    console.error('[migrate-crypto] Fatal error:', err.message);
+    process.exitCode = 1;
+    db.quit().catch(() => {});
+  });
+}
+
+module.exports = {
+  migrate,
+  encryptLegacy,
+  encryptNew,
+  decryptNew,
+  decryptLegacy,
+  tokenKeyPatterns,
+  isLegacy,
+  isNewScheme
+};
