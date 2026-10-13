@@ -288,3 +288,44 @@ The two-part fix: default the admin bind host to `'127.0.0.1'` in `lib/rest/inde
 so the server uses IPv4, and add IPv6 bracket notation in `admin-helper.js` as a
 defensive fallback for any future IPv6 binding. Together, KD-003 (28 failures) and
 the newly surfaced KD-003a (6 failures) were fully resolved.
+
+---
+
+## Independent Validation
+
+After the modernization was complete, the full diff against upstream
+(`a294cac..HEAD`) was independently reviewed by **Muse Wonder** (Meta) — a
+different AI system from the IBM Bob agent that authored the changes — acting as
+a second, adversarial reviewer alongside GitHub Copilot's PR review.
+
+**Verdict: sound.** No critical or high-severity findings.
+
+What the review verified:
+
+- The AES-256-GCM replacement is implemented correctly: random 96-bit IV per
+  message, auth tag stored and verified on decryption, and legacy ciphertext
+  rejected with a coded error that points operators at the migration script.
+- The data migration's coverage is complete: `tokenEncrypted` is the only
+  encrypted field in the codebase, and the script's Redis scan patterns match
+  `token.dao.js`'s real key formats — the same pattern class Copilot's P1
+  finding corrected in PR #2, now guarded by regression tests.
+- The admin-route CRUD factory refactor is behavior-identical to the three
+  original route files (status codes and update semantics compared
+  line-by-line).
+- Test integrity: no test was skipped, `only`-ed, or weakened anywhere in the
+  diff; the characterization suite is exactly 31 substantive behavior tests.
+- The ESLint exemption for the removed crypto APIs was deleted, so the lint
+  gate now actively forbids them.
+
+The review recorded five medium/low findings, all accepted as documented
+trade-offs rather than defects: JWT algorithm acceptance narrows to RS256/HS256
+unless operators configure `algorithms` explicitly (a jsonwebtoken v9
+requirement); the default scrypt salt is a known constant unless
+`EG_CRYPTO_SCRYPT_SALT` is set per installation; scrypt key derivation runs on
+every encrypt/decrypt call; issued credential IDs changed from base62 to
+standard UUID format at equal entropy; and the migration script hardcodes the
+legacy cipher and must run with gateway writes quiesced.
+
+As part of the review, the gates were re-run independently from a fresh clone:
+ESLint clean on `lib/` and `scripts/`, and the migration-script and
+characterization suites passed 42/42.
