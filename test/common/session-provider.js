@@ -3,6 +3,7 @@ class Provider {
   constructor (options) {
     data = options;
   }
+
   ;
   on () {}
 }
