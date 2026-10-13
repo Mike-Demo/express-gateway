@@ -1,0 +1,21 @@
+# TEMPORARY diagnostic image (branch ce-debug only). Identical to
+# Dockerfile.demo except the entrypoint is the debug-boot.js wrapper, which
+# runs the gateway as a child and serves its captured output over HTTP.
+FROM node:22-alpine
+
+WORKDIR /app
+
+ENV NODE_ENV=production \
+    EG_CONFIG_DIR=/app/lib/config \
+    EG_DISABLE_CONFIG_WATCH=true \
+    EG_HTTP_PORT=8080
+
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+
+COPY lib ./lib
+COPY debug-boot.js ./debug-boot.js
+
+EXPOSE 8080
+
+CMD ["node", "/app/debug-boot.js"]
