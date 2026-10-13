@@ -37,3 +37,17 @@ These reports are the required judging evidence for the modernization-factory pr
 The agent attempted to export these reports programmatically but confirmed that the Bob IDE export
 function is only available through the UI. The code artifacts for all three stages are fully committed
 to `origin/modernization-factory`. See the commit history for the complete deliverable record.
+
+## Exports on file (updated 2026-10-12)
+
+| File | Contents |
+|---|---|
+| `g0-g3-all-stages.md` | Marathon task export as of G3 (exported 2026-10-09) |
+| `g0-g3-budget-usage.jpg`, `g0-g3-context-breakdown.jpg` | Budget/context screenshots for the G0–G3 session |
+| `g4-phases-a-through-d.md` | Marathon task (ID 9ec7bda6) re-exported 2026-10-12 — full history /init → G3 → G4 Phases A–D |
+| `g4-phases-e-and-f.md` | Fresh task (ID f2bd7660) — G4 Phase E (E0/E0b/E0c + E1 refactor) and Phase F (runtime alignment + audit remediation) |
+
+The two G4 exports together with the G0–G3 export cover the complete Bob task history
+for stages G0–G4. Both G4 exports were scanned before commit: no passwords, tokens,
+API keys, or host addresses are present (matches are package names and concepts in
+code and documentation).
