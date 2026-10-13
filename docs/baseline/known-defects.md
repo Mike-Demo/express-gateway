@@ -39,35 +39,45 @@ expected TypeError { message: 'Cannot read properties of null (reading 'should')
 
 ---
 
-## KD-002 — CLI tests: yeoman-test/lib/adapter not found
+## KD-002 — CLI tests: config-singleton isolation causes rest() to return undefined
 
-**Count:** 32 failures (tests 1–32)  
-**Root cause:** `test/fixtures/cli/environment.js` requires `yeoman-test/lib/adapter`, which does not exist in the installed version of `yeoman-test`. The package's internal API changed in a minor version after the test was written.
+**Count:** 31 failures (in full-suite run only; 0 failures when CLI tests run in isolation)
 
-**Error message:**
+**⚠ DIAGNOSIS CORRECTION (Phase E, commit E0):** The original G2 diagnosis ("Cannot find module 'yeoman-test/lib/adapter'") was incorrect. `yeoman-test@1.9.1` ships `lib/adapter` and it has always been importable. The real failure mode is a config-singleton isolation bug.
+
+**Root cause:** CLI tests call `adminHelper.start()` with no config argument. `admin-helper.js` passes `config: undefined` to `rest()`, which falls back to `require('../../lib/config')` — the module-level singleton. When the full test suite runs, test files that precede the CLI tests (REST API tests) call `config.loadGatewayConfig()` on temp YAML files that contain no `admin:` section. The singleton retains this state. When `rest()` checks `cfg.admin` it finds it missing and returns `undefined` instead of a Promise, causing `adminHelper.start()` to throw `TypeError: Cannot read properties of undefined (reading 'then')`.
+
+**Error message (full-suite only):**
 ```
-Error: Cannot find module 'yeoman-test/lib/adapter'
+TypeError: Cannot read properties of undefined (reading 'then')
+  at Object.start (test/common/admin-helper.js:6:30)
 ```
 
-**Affected test suites:** All `test/cli/**/*.test.js` — apps, credential-scopes, credentials, scopes, tokens, users commands.
+**Isolation behaviour:** Running `test/cli/**/*.test.js` alone → **98 passing, 0 failing**.
 
-**Fix target:** G3/G4 — update `yeoman-test` or mock the CLI adapter differently.
+**Affected test suites:** All `test/cli/**/*.test.js` — apps, credential-scopes, credentials, scopes, tokens, users commands (31 "before all" hook failures in full-suite run).
+
+**Fix target:** Phase E (E0b) — modify `adminHelper.start()` to supply an explicit default config when none is provided, breaking the dependency on the singleton.
+
+**Status:** Open as of E0 commit. Will be resolved in E0b.
 
 ---
 
-## KD-003 — REST API admin tests return 404
+## KD-003 — REST API admin tests return 404 ✅ RESOLVED (Phase E, commit E0)
 
-**Count:** 25 failures (tests 71–95)  
-**Root cause:** `test/rest-api/*.test.js` tests use `admin-helper.js` which starts the admin REST server on port 0. The admin `superagent` client then calls the admin API. The 404 responses indicate the admin server is either not starting or the route is not matching. Investigation shows these tests pass on Node 10/12 — likely a timing or admin client URL resolution issue on Node 24, possibly related to `adminHelper.start()` promise resolution timing.
+**Count (original):** 28 failures across all `test/rest-api/` files (25 in the five `.test.js` files + 3 in `users.js`, `applications.js`, `credentials.js`).
 
-**Error message:**
-```
-Not Found
-```
+**Root cause (confirmed):** On Node 24, `localhost` resolves to `::1` (IPv6 loopback). `lib/rest/index.js` defaulted the admin bind host to `'localhost'`, so the server bound on `::1`. `admin-helper.js` then constructed the client base URL as `` `http://${srvInfo.address}:${srvInfo.port}` `` which produced `http://::1:PORT` — an invalid URL (bare IPv6 address without brackets). Node 24's `url.parse()` emitted a deprecation warning and misrouted the request path, resulting in 404 on every request.
 
-**Affected test suites:** `test/rest-api/api-endpoint.test.js`, `pipelines.test.js`, `policies.test.js`, `schemas.test.js`, `service-endpoint.test.js`.
+**Fix applied (commit E0):**
+- `lib/rest/index.js` line 17: default host changed from `'localhost'` to `'127.0.0.1'`.
+- `test/common/admin-helper.js`: URL construction now bracket-wraps IPv6 addresses: `srvInfo.family === 'IPv6' ? \`[\${srvInfo.address}]\` : srvInfo.address`.
 
-**Fix target:** G3 — investigate admin client URL construction; likely needs `http://127.0.0.1` instead of `http://` + IPv6 loopback on Node 24.
+**Outcome:** 22 of 28 failures resolved. 6 remain (4 pipeline PUT/DELETE 422s, 2 schema errors) — these were masked by the 404 and are separate pre-existing issues being tracked below.
+
+**Affected test suites:** All `test/rest-api/` files.
+
+**Post-E0 baseline:** 453 passing / 63 failing (full `npm run test:unit`).
 
 ---
 
@@ -196,21 +206,45 @@ expected 200 "OK", got 400 "Bad Request"
 
 ---
 
+## KD-003a — REST API pipeline create/update and schema failures (6 failures, surfaced post-E0)
+
+**Count:** 6 failures (surfaced after KD-003 URL fix; were previously masked by 404)
+
+**Root cause:** `lib/config/config.js` `updateGatewayConfig()` (line 134–155) validates pipeline policy steps by looking up each policy in `require('../policies').policies`. When only the admin REST server is started (without a full gateway), `policies.load()` is never called and the `policies` map is empty. Any pipeline PUT that references a policy (e.g., `proxy`) finds `policyDefinition` as `undefined`, causing `TypeError: Cannot read properties of undefined (reading 'schema')` which is caught, assigned `code: 'INVALID_CONFIG'`, and returned to the client as 422 Unprocessable Entity.
+
+The schema route (`test/rest-api/schemas.test.js`) also reads from the same empty `policies` map and fails when iterating over schemas.
+
+**Error messages:**
+```
+Error: Unprocessable Entity   (422 — pipeline PUT)
+TypeError: Cannot read properties of undefined (reading 'schema')   (GET /schemas)
+TypeError: Cannot read properties of undefined (reading '$id')      (GET /schemas/:name)
+```
+
+**Affected tests:**
+- `test/rest-api/pipelines.test.js` — `should create a new pipeline` (×2), `should update existing pipeline`, `should delete existing pipeline`
+- `test/rest-api/schemas.test.js` — `should list all policy schemas`, `should find basic-auth policy`
+
+**Fix target:** Phase E (E0c) — either load policies before admin routes serve, or restructure the pipeline validation to handle the no-policies case gracefully.
+
+**Status:** Open as of E0 commit. Will be addressed in E0c.
+
+---
+
 ## Summary Table
 
-| ID | Count | Severity | Target Stage | Auto-resolves with |
-|---|---|---|---|---|
-| KD-001 | 64 | 🔴 Critical | G4 | — (primary fix) |
-| KD-002 | 32 | 🟡 Medium | G3 | — |
-| KD-003 | 25 | 🟡 Medium | G3 | — |
-| KD-004 | 4 | 🟡 Medium | G3 | — |
-| KD-005 | 1 | 🟡 Low | G3 | — |
-| KD-006 | 2 | 🟡 Low | G3 | — |
-| KD-007 | 2 | 🟡 Low | G3 | — |
-| KD-008 | 6 | 🟡 Medium | G3 | — |
-| KD-009 | 2 | 🟡 Low | G3 | — |
-| KD-010 | 1 | 🟡 Low | G3 | — |
-| KD-011 | 2 | 🔴 Critical | G4 | KD-001 |
-| **Total** | **141\*** | | | |
-
-\* 141 individual failure slots across 127 unique test failures (some tests listed in multiple categories for cross-reference).
+| ID | Count | Severity | Target Stage | Auto-resolves with | Status |
+|---|---|---|---|---|---|
+| KD-001 | 64 | 🔴 Critical | G4 | — (primary fix) | ✅ Resolved (Phase A) |
+| KD-002 | 31 | 🟡 Medium | Phase E E0b | — | Open (config isolation) |
+| KD-003 | 28 | 🟡 Medium | Phase E E0 | — | ✅ Resolved 22/28 (E0) |
+| KD-003a | 6 | 🟡 Medium | Phase E E0c | KD-003 | Open (policies not loaded) |
+| KD-004 | 4 | 🟡 Medium | G3 | — | Open |
+| KD-005 | 1 | 🟡 Low | G3 | — | Open |
+| KD-006 | 2 | 🟡 Low | G3 | — | Open |
+| KD-007 | 2 | 🟡 Low | G3 | — | Open |
+| KD-008 | 6 | 🟡 Medium | G3 | — | Open |
+| KD-009 | 2 | 🟡 Low | G3 | — | Open |
+| KD-010 | 1 | 🟡 Low | G3 | — | Open |
+| KD-011 | 2 | 🔴 Critical | G4 | KD-001 | ✅ Resolved (Phase A) |
+| **Post-E0 open** | **55** | | | | 63 failing / 453 passing |
