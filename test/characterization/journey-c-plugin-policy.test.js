@@ -10,12 +10,7 @@
  *   - egContext.requestID is set per request
  *   - Multi-step policy chain executes in declaration order
  *   - basic-auth returns 401 with no credentials (no crypto path needed)
- *   - Crypto-broken path: KD-001 pin — encrypt/decrypt throws on Node 24
- *
- * NOTE ON KD-001 CRYPTO PIN (C8a/C8b):
- *   These tests PASS when crypto.createCipher throws (current Node 24 state).
- *   When G4 replaces createCipher with createCipheriv, C8a/C8b must be updated
- *   to assert success instead of failure, and known-defects KD-001 closed.
+ *   - C8: AES-256-GCM encrypt/decrypt round-trip (KD-001 resolved G4/A1)
  */
 const assert = require('assert');
 const request = require('supertest');
@@ -268,48 +263,48 @@ describe('[characterization] Journey C — plugin/policy chain execution', funct
     });
   });
 
-  // ── C8: KD-001 crypto pin — documents current broken state on Node 24 ─────
+  // ── C8: KD-001 resolved — AES-256-GCM encrypt/decrypt works on Node 22+ ──
 
-  describe('C8: KD-001 crypto.createCipher failure pin (Node 24)', function () {
+  describe('C8: encrypt/decrypt round-trip (KD-001 resolved in G4/A1)', function () {
     /**
-     * MAINTENANCE NOTE:
-     * When G4 replaces crypto.createCipher with createCipheriv:
-     *   1. Change these tests to assert that encrypt/decrypt SUCCEED.
-     *   2. Mark KD-001 resolved in docs/baseline/known-defects.md.
-     *   3. The 127 baseline failures should drop significantly.
+     * Updated in G4/A1: crypto.createCipher replaced with AES-256-GCM.
+     * These tests now assert that encrypt/decrypt SUCCEED and produce the
+     * correct output format (ADR U07). KD-001 is closed.
      */
-    it('C8a: services.utils.encrypt throws TypeError on Node ≥22 (KD-001)', function () {
+    it('C8a: services.utils.encrypt returns iv:tag:ciphertext hex format', function () {
       const utils = require('../../lib/services/utils');
-      let threw = false;
-      try {
-        utils.encrypt('test-value');
-      } catch (err) {
-        threw = true;
-        assert.ok(
-          err instanceof TypeError &&
-          (err.message.includes('createCipher') || err.message.includes('not a function')),
-          `expected createCipher TypeError, got: ${err.message}`
-        );
-      }
-      assert.ok(threw,
-        'utils.encrypt must throw on Node ≥22 — if passing, G4 crypto fix is in place; update this test');
+      const result = utils.encrypt('test-value');
+      assert.ok(typeof result === 'string', 'encrypt must return a string');
+      assert.ok(
+        /^[0-9a-f]{24}:[0-9a-f]{32}:[0-9a-f]+$/.test(result),
+        `encrypt output must match iv:tag:ciphertext hex format, got: ${result}`
+      );
     });
 
-    it('C8b: services.utils.decrypt throws TypeError on Node ≥22 (KD-001)', function () {
+    it('C8b: services.utils.decrypt(encrypt(text)) === text (round-trip)', function () {
       const utils = require('../../lib/services/utils');
+      const plaintext = 'test-value-roundtrip';
+      const ciphertext = utils.encrypt(plaintext);
+      const recovered = utils.decrypt(ciphertext);
+      assert.strictEqual(recovered, plaintext,
+        'decrypt(encrypt(text)) must equal original plaintext');
+    });
+
+    it('C8c: services.utils.decrypt throws LegacyEncryptionError for legacy ciphertext', function () {
+      const utils = require('../../lib/services/utils');
+      // Legacy format is pure hex with no colons (output of old createCipher)
+      const legacyCiphertext = 'aabbccddeeff00112233445566778899';
       let threw = false;
       try {
-        utils.decrypt('aabbccdd');
+        utils.decrypt(legacyCiphertext);
       } catch (err) {
         threw = true;
-        assert.ok(
-          err instanceof TypeError &&
-          (err.message.includes('createDecipher') || err.message.includes('not a function')),
-          `expected createDecipher TypeError, got: ${err.message}`
-        );
+        assert.strictEqual(err.code, 'LEGACY_ENCRYPTION',
+          `expected err.code LEGACY_ENCRYPTION, got: ${err.code}`);
+        assert.ok(err.message.includes('LegacyEncryptionError'),
+          `expected LegacyEncryptionError in message, got: ${err.message}`);
       }
-      assert.ok(threw,
-        'utils.decrypt must throw on Node ≥22 — if passing, G4 crypto fix is in place; update this test');
+      assert.ok(threw, 'decrypt must throw for legacy (no-colon) ciphertext');
     });
   });
 });
