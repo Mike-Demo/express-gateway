@@ -106,6 +106,14 @@ steps above):
   container exited instantly until the deployment Dockerfile was placed at
   the branch root. Recorded here so the setup is reproducible.
 - **Lifetime:** keep the application and project until after the winners
-  announcement (2026-10-28), then delete both. The submission media
-  (videos, pitch deck) are additionally hosted on IBM Cloud Object Storage
-  (instance `bob-modernization-factory-assets`).
+  announcement (2026-10-28), then delete both.
+
+## Submission media on IBM Cloud Object Storage
+
+The demo videos and pitch deck are also hosted on IBM Cloud Object Storage
+(instance `bob-modernization-factory-assets`, bucket
+`bob-modernization-factory`, us-south; objects are public-read):
+
+- Sizzle (84s): https://bob-modernization-factory.s3.us-south.cloud-object-storage.appdomain.cloud/bob-modernization-factory-sizzle.mp4
+- Walkthrough (3:54): https://bob-modernization-factory.s3.us-south.cloud-object-storage.appdomain.cloud/bob-modernization-factory-walkthrough.mp4
+- Pitch deck (PDF): https://bob-modernization-factory.s3.us-south.cloud-object-storage.appdomain.cloud/bob-modernization-factory-pitch-deck.pdf
