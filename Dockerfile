@@ -1,21 +1,19 @@
-FROM node:22-alpine
+# Fix candidate (branch ce-debug): identical to Dockerfile.demo except the
+# base image is Debian slim (glibc) instead of Alpine (musl).
+FROM node:22-bookworm-slim
 
-LABEL maintainer Vincenzo Chianese, vincenzo@express-gateway.io
+WORKDIR /app
 
-ARG EG_VERSION
-ENV NODE_ENV production
-ENV NODE_PATH /usr/local/share/.config/yarn/global/node_modules/
-ENV EG_CONFIG_DIR /var/lib/eg
-# Enable chokidar polling so hot-reload mechanism can work on docker or network volumes
-ENV CHOKIDAR_USEPOLLING true
+ENV NODE_ENV=production \
+    EG_CONFIG_DIR=/app/lib/config \
+    EG_DISABLE_CONFIG_WATCH=true \
+    EG_HTTP_PORT=8080
 
-VOLUME /var/lib/eg
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
 
-RUN yarn global add express-gateway@$EG_VERSION
+COPY lib ./lib
 
-COPY ./bin/generators/gateway/templates/basic/config /var/lib/eg
-COPY ./lib/config/models /var/lib/eg/models
+EXPOSE 8080
 
-EXPOSE 8080 9876
-
-CMD ["node", "-e", "require('express-gateway')().run();"]
+CMD ["node", "-e", "require('/app/lib')().run();"]
