@@ -77,3 +77,35 @@ ibmcloud ce app create --name express-gateway \
   --env EG_HTTP_PORT=8080
 ibmcloud ce app get --name express-gateway   # prints the public URL
 ```
+
+## As-built record (deployed 2026-10-13)
+
+The demo is **live**, deployed via the Code Engine API (not the console
+steps above):
+
+- **Live URL:** https://express-gateway.2fvcceamgpwi.us-south.codeengine.appdomain.cloud
+- **Try it:** `/api-endpoints`, `/users`, and `/service-endpoints` return
+  live JSON from the gateway's Admin API, proxied through the gateway's own
+  pipeline. The root `/` returns the gateway's plain `Cannot GET /` — the
+  sample configuration defines no route there; that response *is* the
+  gateway answering.
+- **Platform:** IBM Cloud Code Engine project `bob-modernization-factory`
+  (us-south), application `express-gateway`. Container image
+  `us.icr.io/bob-modernization-factory/express-gateway:v2` (IBM Container
+  Registry, namespace `bob-modernization-factory`), built from this
+  repository's modernized source on Node 22 (`node:22-bookworm-slim`).
+- **Sizing / scaling:** 1 vCPU / 2 GiB, port 8080, min instances **1**
+  (kept warm so judges never wait on a cold start), max instances 2.
+- **Environment:** `NODE_ENV=production`, `EG_CONFIG_DIR=/app/lib/config`,
+  `EG_DISABLE_CONFIG_WATCH=true`, `EG_HTTP_PORT=8080`.
+- **Build note:** the deployment Dockerfile lives at the root of the
+  `ce-debug` branch. The Code Engine build API silently dropped the
+  `strategy_location` field on build creation (stored as `null`), so every
+  build used `./Dockerfile` — initially the *upstream* image, whose
+  config directory did not match `EG_CONFIG_DIR=/app/lib/config`; the
+  container exited instantly until the deployment Dockerfile was placed at
+  the branch root. Recorded here so the setup is reproducible.
+- **Lifetime:** keep the application and project until after the winners
+  announcement (2026-10-28), then delete both. The submission media
+  (videos, pitch deck) are additionally hosted on IBM Cloud Object Storage
+  (instance `bob-modernization-factory-assets`).
