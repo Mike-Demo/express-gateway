@@ -1,3 +1,39 @@
+## IBM Bob Modernization Factory — Submission
+
+This repository is a submission for the IBM Bob Modernization Factory hackathon.
+The `modernization-factory` branch contains all G0–G4 modernization work.
+
+| | |
+|---|---|
+| **Modernization summary** | [`docs/submission/modernization-summary.md`](docs/submission/modernization-summary.md) |
+| **Evidence index** | [`docs/submission/evidence-index.md`](docs/submission/evidence-index.md) |
+| **Security disposition** | [`docs/baseline/security-disposition-f2.md`](docs/baseline/security-disposition-f2.md) |
+| **Test result** | 551 passing / 32 failing (was 357 / 127) |
+| **Lint** | 0 errors / 0 warnings |
+| **Node target** | 22 LTS (`>=22.0.0`) |
+
+### Run on Node 22
+
+```bash
+# Install dependencies
+npm install
+
+# Run the gateway
+npm start
+
+# Run the unit + policy test suite
+npm run test:unit
+
+# Run only characterization tests
+npx cross-env EG_HTTP_PORT=0 EG_CONFIG_DIR=lib/config EG_DISABLE_CONFIG_WATCH=true \
+  npx mocha --exit --timeout 60000 "test/characterization/**/*.test.js"
+
+# Lint
+npm run lint
+```
+
+---
+
 #### A Microservices API Gateway Built Using Express.js and Express Middleware
 ----
 

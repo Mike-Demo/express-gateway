@@ -1,0 +1,110 @@
+﻿
+
+  [characterization] Journey A ΓÇö auth ΓåÆ proxy pipeline
+2026-10-09T19:30:34.841Z [EG:gateway] [33mwarn[39m: char-echo policy hasn't provided a schema. Validation for this policy will be skipped.
+2026-10-09T19:30:34.859Z [EG:gateway] [32minfo[39m: gateway http server listening on :::55579
+    ΓêÜ A1: request without credentials returns 401
+    1) A2: request with valid apiKey passes to backend with consumer ID header
+    ΓêÜ A3: request with invalid apiKey returns 401
+    2) A4: unauthenticated request on passThrough endpoint reaches backend as anonymous
+    ΓêÜ A5: egContext.requestID is non-empty on each request
+    ΓêÜ A6: request to unregistered path returns 404
+
+  [characterization] Journey B ΓÇö admin API and config management
+2026-10-09T19:30:35.028Z [EG:admin] [32minfo[39m: admin http server listening on 127.0.0.1:55586
+    ΓêÜ B1: admin server starts and /policies returns an array
+2026-10-09T19:30:35.072Z [EG:admin] [32minfo[39m: admin http server listening on 127.0.0.1:55588
+    ΓêÜ B2: PUT /api-endpoints/:name writes entry to gateway.config.yml
+2026-10-09T19:30:35.109Z [EG:admin] [32minfo[39m: admin http server listening on 127.0.0.1:55590
+    ΓêÜ B3: PUT /api-endpoints/:name updates an existing entry
+2026-10-09T19:30:35.138Z [EG:admin] [32minfo[39m: admin http server listening on 127.0.0.1:55593
+    ΓêÜ B4: DELETE /api-endpoints/:name ΓÇö documents KD-003 behaviour on Node 24
+2026-10-09T19:30:35.158Z [EG:admin] [32minfo[39m: admin http server listening on 127.0.0.1:55596
+    ΓêÜ B5: PUT /pipelines/:name writes pipeline to gateway.config.yml
+2026-10-09T19:30:35.179Z [EG:admin] [32minfo[39m: admin http server listening on 127.0.0.1:55598
+    ΓêÜ B6: GET /api-endpoints/:name ΓÇö documents KD-003 behaviour on Node 24
+2026-10-09T19:30:35.199Z [EG:admin] [32minfo[39m: admin http server listening on 127.0.0.1:55601
+    ΓêÜ B7: GET /api-endpoints/nonexistent returns 404
+2026-10-09T19:30:35.216Z [EG:admin] [32minfo[39m: admin http server listening on 127.0.0.1:55603
+2026-10-09T19:30:35.221Z [EG:config] [31merror[39m: Invalid pipelines configuration: TypeError: Cannot read properties of undefined (reading 'schema')
+    ΓêÜ B8: PUT /pipelines with unknown policy returns 422 INVALID_CONFIG
+
+  [characterization] Journey C ΓÇö plugin/policy chain execution
+    C1: policy registry
+2026-10-09T19:30:35.225Z [EG:gateway] [33mwarn[39m: char-c1a-1791574235225 policy hasn't provided a schema. Validation for this policy will be skipped.
+      ΓêÜ C1a: registered policy is resolvable by name
+2026-10-09T19:30:35.226Z [EG:policy] [31merror[39m: Could not find policy char-nonexistent-1791574235226, Please make sure the plugins providing such policy
+     is correctly configured in system.config file.
+      ΓêÜ C1b: unregistered policy throws POLICY_NOT_FOUND
+    C2: policy with no schema passes validation
+2026-10-09T19:30:35.227Z [EG:gateway] [33mwarn[39m: char-c2-1791574234827 policy hasn't provided a schema. Validation for this policy will be skipped.
+2026-10-09T19:30:35.230Z [EG:gateway] [32minfo[39m: gateway http server listening on :::55605
+      ΓêÜ C2: request passes through policy with null schema
+    C3: condition evaluation in pipeline
+2026-10-09T19:30:35.234Z [EG:gateway] [33mwarn[39m: char-c3-1791574234827 policy hasn't provided a schema. Validation for this policy will be skipped.
+2026-10-09T19:30:35.237Z [EG:gateway] [32minfo[39m: gateway http server listening on :::55607
+      ΓêÜ C3a: pathMatch condition ΓÇö matching path reaches policy
+      ΓêÜ C3b: pathMatch condition ΓÇö non-matching path skips policy ΓåÆ 404
+    C4: policy whitelist enforcement
+2026-10-09T19:30:35.245Z [EG:gateway] [31merror[39m: proxy policy not declared in the 'policies' gateway.config section
+      ΓêÜ C4: pipeline referencing undeclared policy throws POLICY_NOT_DECLARED at build time
+    C5: egContext.requestID is set per request
+2026-10-09T19:30:35.246Z [EG:gateway] [33mwarn[39m: char-c5-1791574234827 policy hasn't provided a schema. Validation for this policy will be skipped.
+2026-10-09T19:30:35.248Z [EG:gateway] [32minfo[39m: gateway http server listening on :::55610
+      ΓêÜ C5: each request receives a non-empty requestID
+    C6: multi-step policy chain execution order
+2026-10-09T19:30:35.254Z [EG:gateway] [33mwarn[39m: char-c6a-1791574234827 policy hasn't provided a schema. Validation for this policy will be skipped.
+2026-10-09T19:30:35.255Z [EG:gateway] [33mwarn[39m: char-c6b-1791574234827 policy hasn't provided a schema. Validation for this policy will be skipped.
+2026-10-09T19:30:35.257Z [EG:gateway] [32minfo[39m: gateway http server listening on :::55612
+      ΓêÜ C6: policies execute in declaration order: A then B
+    C7: basic-auth policy ΓÇö 401 without credentials
+2026-10-09T19:30:35.270Z [EG:gateway] [32minfo[39m: gateway http server listening on :::55614
+      ΓêÜ C7: basic-auth returns 401 when no Authorization header is provided
+    C8: KD-001 crypto.createCipher failure pin (Node 24)
+      ΓêÜ C8a: services.utils.encrypt throws TypeError on Node ΓëÑ22 (KD-001)
+      ΓêÜ C8b: services.utils.decrypt throws TypeError on Node ΓëÑ22 (KD-001)
+
+  [characterization] smoke ΓÇö gateway and admin startup
+2026-10-09T19:30:35.277Z [EG:gateway] [32minfo[39m: gateway http server listening on :::55616
+2026-10-09T19:30:35.279Z [EG:admin] [32minfo[39m: admin http server listening on 127.0.0.1:55617
+    ΓêÜ gateway HTTP server is listening on a port > 0
+    ΓêÜ gateway responds to requests (no matching pipeline ΓåÆ 404)
+    ΓêÜ admin HTTP server is listening on a port > 0
+    ΓêÜ admin /policies endpoint returns JSON array
+    ΓêÜ admin /schemas endpoint returns JSON
+
+
+  28 passing (469ms)
+  2 failing
+
+  1) [characterization] Journey A ΓÇö auth ΓåÆ proxy pipeline
+       A2: request with valid apiKey passes to backend with consumer ID header:
+     Error: expected 200 "OK", got 401 "Unauthorized"
+      at Test._assertStatus (node_modules\supertest\lib\test.js:268:12)
+      at Test._assertFunction (node_modules\supertest\lib\test.js:283:11)
+      at Test.assert (node_modules\supertest\lib\test.js:173:18)
+      at localAssert (node_modules\supertest\lib\test.js:131:12)
+      at C:\Users\Administrator.BOB-WINDOWS\Documents\express-gateway\node_modules\supertest\lib\test.js:128:5
+      at Request.callback (node_modules\supertest\node_modules\superagent\lib\node\index.js:728:3)
+      at IncomingMessage.<anonymous> (node_modules\supertest\node_modules\superagent\lib\node\index.js:916:18)
+      at IncomingMessage.emit (node:events:526:24)
+      at endReadableNT (node:internal/streams/readable:1764:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+
+  2) [characterization] Journey A ΓÇö auth ΓåÆ proxy pipeline
+       A4: unauthenticated request on passThrough endpoint reaches backend as anonymous:
+     TypeError: Cannot read properties of null (reading 'should')
+      at C:\Users\Administrator.BOB-WINDOWS\Documents\express-gateway\test\characterization\journey-a-auth-proxy.test.js:132:29
+      at Test._assertFunction (node_modules\supertest\lib\test.js:283:11)
+      at Test.assert (node_modules\supertest\lib\test.js:173:18)
+      at localAssert (node_modules\supertest\lib\test.js:131:12)
+      at C:\Users\Administrator.BOB-WINDOWS\Documents\express-gateway\node_modules\supertest\lib\test.js:128:5
+      at Request.callback (node_modules\supertest\node_modules\superagent\lib\node\index.js:716:12)
+      at C:\Users\Administrator.BOB-WINDOWS\Documents\express-gateway\node_modules\supertest\node_modules\superagent\lib\node\index.js:916:18
+      at IncomingMessage.<anonymous> (node_modules\supertest\node_modules\superagent\lib\node\parsers\json.js:19:7)
+      at IncomingMessage.emit (node:events:526:24)
+      at endReadableNT (node:internal/streams/readable:1764:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+
+
+

@@ -32,8 +32,6 @@
       "error",
       {
         "ignoreModuleItems": [
-          "crypto.createCipher",
-          "crypto.createDecipher",
           "url.parse"
         ]
       }
