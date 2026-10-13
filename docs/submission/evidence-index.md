@@ -18,9 +18,11 @@ All session exports are stored under [`docs/evidence/bob-sessions/`](../evidence
 | [`g0-g3-budget-usage.jpg`](../evidence/bob-sessions/g0-g3-budget-usage.jpg) | 2026-10-09 | Screenshot: Bobcoin budget usage for the G0–G3 session. |
 | [`g0-g3-context-breakdown.jpg`](../evidence/bob-sessions/g0-g3-context-breakdown.jpg) | 2026-10-09 | Screenshot: context window breakdown for the G0–G3 session. |
 | [`g4-phases-a-through-d.md`](../evidence/bob-sessions/g4-phases-a-through-d.md) | 2026-10-12 | Marathon task (ID 9ec7bda6) re-exported 2026-10-12. Full history /init → G3 → G4 Phases A–D (crypto fix, uuid, AUTO upgrades, CODE upgrades D1–D8). |
-| [`g4-phases-e-and-f.md`](../evidence/bob-sessions/g4-phases-e-and-f.md) | 2026-10-12 | Fresh task (ID f2bd7660). G4 Phase E (E0 admin URL fix, E0b CLI isolation, E0c policy loading, E1 CRUD factory) and Phase F (F1 Node 22 alignment, F2 audit remediation + abort). |
+| [`g4-phases-e-and-f.md`](../evidence/bob-sessions/g4-phases-e-and-f.md) | 2026-10-12 | Fresh task (ID f2bd7660). G4 Phase E (E0 admin URL fix, E0b CLI isolation, E0c policy loading, E1 CRUD factory) and Phase F (F1 Node 22 alignment, F2 audit remediation + abort), continued in the same task for G8 (submission documentation). Complete re-export including the G8 continuation. |
+| [`g9-pull-request.md`](../evidence/bob-sessions/g9-pull-request.md) | 2026-10-12 | Fresh task (ID 22c44e17). G9: final verification runs and PR #1 creation (prompt-as-spec; plan.md has no G9 section). |
+| [`pr1-copilot-p1-fix.md`](../evidence/bob-sessions/pr1-copilot-p1-fix.md) | 2026-10-12 | Fresh task (ID c8a6b384). Copilot P1 fix on PR #1: migrate-crypto.js scan-pattern correction, 11-test migration suite, migration docs. Commit `d3b8ca2`. |
 
-All five files are committed at `d074e93` (2026-10-12).
+The first five files were committed at `d074e93` (2026-10-12). The G9 and PR #1 P1-fix exports and the complete E–F–G8 re-export were added in a follow-up evidence commit on `master` (2026-10-12). Bobcoin usage ledger (per-phase panel readings): [`docs/evidence/bobcoin-usage-ledger.md`](../evidence/bobcoin-usage-ledger.md).
 
 ---
 

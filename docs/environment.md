@@ -9,7 +9,7 @@ development machine provisioned for the hackathon.
 |---|---|
 | Provider | IBM Cloud VPC |
 | Region / Zone | us-south / us-south-1 |
-| Instance | `bob-windows` — Windows Server 2022 |
+| Instance | `bob-windows` — Windows Server 2022 Standard (21H2, build 20348.5622) |
 | Profile | bx2-4x16 (4 vCPU, 16 GB RAM) |
 | Access | RDP (port 3389) |
 | Provisioned | 2026-10-09 |
@@ -21,11 +21,11 @@ console.
 
 | Component | Detail |
 |---|---|
-| OS | Windows Server 2022 (license bundled in the IBM hourly charge) |
+| OS | Windows Server 2022 Standard, version 21H2, OS build 20348.5622, installed 2026-10-09 (license bundled in the IBM hourly charge) |
 | Node.js | 24.21.0 LTS (via Chocolatey at first boot) |
 | Git | via Chocolatey at first boot |
 | VS Code | via Chocolatey at first boot |
-| IBM Bob IDE | 2.0.2+ |
+| IBM Bob IDE | 2.2.1 (build 1.126.0+bob2.2.1 on VS Code 1.126.0; commit 8c20bbb, 2026-09-29) |
 
 ## Purpose
 

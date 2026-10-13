@@ -45,9 +45,8 @@ to `origin/modernization-factory`. See the commit history for the complete deliv
 | `g0-g3-all-stages.md` | Marathon task export as of G3 (exported 2026-10-09) |
 | `g0-g3-budget-usage.jpg`, `g0-g3-context-breakdown.jpg` | Budget/context screenshots for the G0–G3 session |
 | `g4-phases-a-through-d.md` | Marathon task (ID 9ec7bda6) re-exported 2026-10-12 — full history /init → G3 → G4 Phases A–D |
-| `g4-phases-e-and-f.md` | Fresh task (ID f2bd7660) — G4 Phase E (E0/E0b/E0c + E1 refactor) and Phase F (runtime alignment + audit remediation) |
+| `g4-phases-e-and-f.md` | Fresh task (ID f2bd7660) — G4 Phase E (E0/E0b/E0c + E1 refactor), Phase F (runtime alignment + audit remediation), and G8 (submission documentation), continued in the same task. Complete re-export 2026-10-12 including the G8 continuation. |
+| `g9-pull-request.md` | Fresh task (ID 22c44e17) — G9: final verification runs and PR #1 creation (prompt-as-spec; plan.md has no G9 section) |
+| `pr1-copilot-p1-fix.md` | Fresh task (ID c8a6b384) — Copilot P1 fix on PR #1: migrate-crypto.js scan-pattern correction, 11-test migration suite, migration docs. Commit `d3b8ca2` |
 
-The two G4 exports together with the G0–G3 export cover the complete Bob task history
-for stages G0–G4. Both G4 exports were scanned before commit: no passwords, tokens,
-API keys, or host addresses are present (matches are package names and concepts in
-code and documentation).
+Together, these exports cover the complete Bob task history for stages G0–G9, plus the post-submission PR #1 Copilot P1 fix. All exports were scanned before commit: no passwords, tokens, API keys, or host addresses are present (matches are package names, concepts, and synthetic test-fixture strings in code and documentation). The Bobcoin usage ledger is at [`docs/evidence/bobcoin-usage-ledger.md`](../bobcoin-usage-ledger.md).
