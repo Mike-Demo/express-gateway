@@ -1,8 +1,8 @@
 version: 2
 jobs:
-  "node-8":
+  "node-20":
     docker:
-      - image: circleci/node:8-browsers
+      - image: cimg/node:20.x
     working_directory: ~/repo
 
     steps: &eg-checkout-install
@@ -10,24 +10,16 @@ jobs:
       - run: npm ci
       - run: npm test
 
-  "node-10":
+  "node-22":
     docker:
-      - image: circleci/node:10-browsers
+      - image: cimg/node:22.x
     working_directory: ~/repo
 
     steps: *eg-checkout-install
 
-  "node-12":
+  "node-22-real-redis":
     docker:
-      - image: circleci/node:12-browsers
-    working_directory: ~/repo
-
-    steps: *eg-checkout-install
-
-
-  "node-10-real-redis":
-    docker:
-      - image: circleci/node:10-browsers
+      - image: cimg/node:22.x
       - image: circleci/redis
     working_directory: ~/repo
     environment:
@@ -36,7 +28,7 @@ jobs:
 
   "release-npm-docker-image":
     docker:
-      - image: circleci/node:10
+      - image: cimg/node:22.x
     working_directory: ~/repo
 
     steps:
@@ -51,7 +43,7 @@ jobs:
 
   "update-docker-repo":
     docker:
-      - image: node:10-alpine
+      - image: node:22-alpine
     working_directory: ~/repo
 
     steps:
@@ -145,13 +137,12 @@ workflows:
   version: 2
   build:
     jobs:
-      - node-8: &testingFilters
+      - node-20: &testingFilters
           filters:
             tags:
               only: /v\d+(\.\d+){2}/
-      - node-10: *testingFilters
-      - node-12: *testingFilters
-      - node-10-real-redis: *testingFilters
+      - node-22: *testingFilters
+      - node-22-real-redis: *testingFilters
       - release-npm-docker-image:
           filters: &releaseFilters
             tags:
@@ -159,10 +150,9 @@ workflows:
             branches:
               ignore: /.*/
           requires:
-            - node-8
-            - node-10-real-redis
-            - node-10
-            - node-12
+            - node-20
+            - node-22-real-redis
+            - node-22
       - update-docker-repo: &postNpmPublish
           requires:
             - release-npm-docker-image
