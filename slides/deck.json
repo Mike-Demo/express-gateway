@@ -1,0 +1,215 @@
+{
+  "boltSlidesVersion": 1,
+  "boltSlidesId": "11011050-f9d6-4d43-8a9e-3e43af51bbaf",
+  "deck": {
+    "title": "Bob Modernization Factory — AngelHack IBM Bob Hackathon 2026",
+    "transition": "fade",
+    "font": "space",
+    "accent": "#1688fc"
+  },
+  "slides": [
+    {
+      "id": "s1",
+      "position": 0,
+      "layout": "cover",
+      "props": {
+        "kicker": "AngelHack IBM Bob Hackathon · 2026",
+        "title": "**Bob Modernization Factory**\nLegacy modernization with the ==brakes built in==.",
+        "subtitle": "A controlled, build-gated pipeline for modernizing legacy code with IBM Bob.",
+        "foot": "Working fork: github.com/Mike-Demo/express-gateway"
+      },
+      "background": { "type": "color", "color": "var(--bg)" },
+      "animation": "cascade",
+      "transition": null,
+      "nav": null,
+      "notes": "Set the frame in one line: we didn't build another AI rewriter — we built the assembly line that makes AI rewrites safe to run.",
+      "status": "none"
+    },
+    {
+      "id": "s2",
+      "position": 1,
+      "layout": "statement",
+      "props": {
+        "kicker": "The problem",
+        "title": "AI modernization is usually **one giant rewrite** — breaking in ==a hundred places at once==.",
+        "body": "No checkpoints. No proof each step still builds. No way to stop halfway and ship something that works."
+      },
+      "background": { "type": "color", "color": "var(--bg)" },
+      "animation": "cascade",
+      "transition": null,
+      "nav": null,
+      "notes": "Everyone has watched an agent get 80% through a rewrite and die. You're left with a half-migrated codebase and no safe path back.",
+      "status": "none"
+    },
+    {
+      "id": "s3",
+      "position": 2,
+      "layout": "contrast",
+      "props": {
+        "kicker": "The idea",
+        "title": "A **factory line**, not a leap.",
+        "left": {
+          "label": "The leap",
+          "title": "One-shot rewrite",
+          "points": [
+            "Everything changes at once",
+            "Nothing is verifiable mid-flight",
+            "Failure means starting over"
+          ]
+        },
+        "right": {
+          "label": "The factory",
+          "title": "Gated stations",
+          "points": [
+            "Code moves through stations: assess, plan, transform, verify",
+            "A build gate at every station",
+            "Stop at any point with a working codebase"
+          ]
+        }
+      },
+      "background": { "type": "color", "color": "var(--bg)" },
+      "animation": "cascade",
+      "transition": null,
+      "nav": null,
+      "notes": "The metaphor is the pitch: a factory line doesn't move faster by skipping inspection — it moves faster because nothing broken gets downstream.",
+      "status": "none"
+    },
+    {
+      "id": "s4",
+      "position": 3,
+      "layout": "steps",
+      "props": {
+        "kicker": "How it works",
+        "title": "Small moves, ==gated== at every step.",
+        "items": [
+          {
+            "title": "Inventory",
+            "body": "Map the legacy surface — routes, middleware, dependencies."
+          },
+          {
+            "title": "Plan",
+            "body": "Generate a modernization plan with IBM Bob, one station at a time."
+          },
+          {
+            "title": "Transform",
+            "body": "Apply small, isolated transformations — never a big bang."
+          },
+          {
+            "title": "Verify",
+            "body": "Run the build after each one. A failed gate halts the line instead of shipping breakage."
+          }
+        ]
+      },
+      "background": { "type": "color", "color": "var(--bg)" },
+      "animation": "cascade",
+      "transition": null,
+      "nav": null,
+      "notes": "Walk the loop once out loud: plan a small change, apply it, build, green means the line advances, red means the line stops right there.",
+      "status": "none"
+    },
+    {
+      "id": "s5",
+      "position": 4,
+      "layout": "bigNumber",
+      "props": {
+        "kicker": "The proving ground",
+        "value": "v1.16.10",
+        "caption": "Express Gateway — a real legacy Node.js API gateway, modernized end-to-end through the pipeline.",
+        "foot": "Working fork: github.com/Mike-Demo/express-gateway"
+      },
+      "background": { "type": "color", "color": "var(--bg)" },
+      "animation": "cascade",
+      "transition": null,
+      "nav": null,
+      "notes": "This isn't a toy repo. Express Gateway is a real, production-era codebase — if the pipeline handles it, the pattern generalizes.",
+      "status": "none"
+    },
+    {
+      "id": "s6",
+      "position": 5,
+      "layout": "bento",
+      "props": {
+        "kicker": "Key features",
+        "title": "What the factory gives you.",
+        "tiles": [
+          {
+            "fig": "01",
+            "title": "Build gates",
+            "body": "Every transformation must pass a build before the line advances.",
+            "variant": "accent"
+          },
+          {
+            "fig": "02",
+            "title": "Halt, don't ship",
+            "body": "A failed gate stops the pipeline with the last good state intact."
+          },
+          {
+            "fig": "03",
+            "title": "Incremental steps",
+            "body": "Small, reviewable transformations instead of one untraceable diff."
+          },
+          {
+            "fig": "04",
+            "title": "Full inventory",
+            "body": "Bob maps the legacy surface before a single line changes."
+          }
+        ]
+      },
+      "background": { "type": "color", "color": "var(--bg)" },
+      "animation": "cascade",
+      "transition": null,
+      "nav": null,
+      "notes": "Hit the two features judges care about: gates that actually block the line, and a codebase that's always shippable between stations.",
+      "status": "none"
+    },
+    {
+      "id": "s7",
+      "position": 6,
+      "layout": "statGrid",
+      "props": {
+        "kicker": "Status",
+        "title": "Built, gated, and **filed**.",
+        "stats": [
+          {
+            "value": "Oct 2026",
+            "label": "AngelHack IBM Bob Hackathon",
+            "caption": "Built and submitted"
+          },
+          {
+            "value": "< 3 min",
+            "label": "Full walkthrough demo",
+            "caption": "Pipeline start to green build"
+          },
+          {
+            "value": "4",
+            "label": "Stations on the line",
+            "caption": "Assess · plan · transform · verify"
+          }
+        ]
+      },
+      "background": { "type": "color", "color": "var(--bg)" },
+      "animation": "cascade",
+      "transition": null,
+      "nav": null,
+      "notes": "Everything you're seeing is real and submitted. Offer the demo here — three minutes, gate failure included.",
+      "status": "none"
+    },
+    {
+      "id": "s8",
+      "position": 7,
+      "layout": "cover",
+      "props": {
+        "kicker": "Bob Modernization Factory",
+        "title": "Modernize without ==losing the build==.",
+        "subtitle": "Walk the pipeline, station by station:\ngithub.com/Mike-Demo/express-gateway",
+        "foot": "AngelHack IBM Bob Hackathon · October 2026"
+      },
+      "background": { "type": "color", "color": "var(--bg)" },
+      "animation": "cascade",
+      "transition": null,
+      "nav": null,
+      "notes": "Close on the repo and invite them to run the pipeline themselves — the fork is live.",
+      "status": "none"
+    }
+  ]
+}
