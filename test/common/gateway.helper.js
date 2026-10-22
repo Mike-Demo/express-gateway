@@ -44,6 +44,7 @@ module.exports.startGatewayInstance = function ({ dirInfo, gatewayConfig, backen
       return new Promise((resolve, reject) => {
         const childEnv = Object.assign({}, process.env);
         childEnv.EG_CONFIG_DIR = dirInfo.configDirectoryPath;
+        childEnv.EG_ADMIN_API_KEY = 'test-admin-key';
         // Tests, by default have config watch disabled.
         // Need to remove this paramter in the child process.
         delete childEnv.EG_DISABLE_CONFIG_WATCH;

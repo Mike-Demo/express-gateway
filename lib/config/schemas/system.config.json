@@ -123,6 +123,12 @@
     },
     "plugins": {
       "type": "object"
+    },
+    "adminApiKey": {
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "required": [

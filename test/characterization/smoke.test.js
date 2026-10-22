@@ -40,6 +40,9 @@ describe('[characterization] smoke — gateway and admin startup', function () {
 
     const adminCfg = Object.create(config);
     adminCfg.gatewayConfig = adminConfig;
+    adminCfg.systemConfig = Object.assign({}, config.systemConfig, {
+      adminApiKey: 'test-admin-key'
+    });
 
     return rest({ config: adminCfg }).then(srv => {
       adminServer = srv;
@@ -81,7 +84,12 @@ describe('[characterization] smoke — gateway and admin startup', function () {
 
   it('admin /policies endpoint returns JSON array', function (done) {
     const { port } = adminServer.address();
-    http.get(`http://127.0.0.1:${port}/policies`, res => {
+    http.get({
+      hostname: '127.0.0.1',
+      port,
+      path: '/policies',
+      headers: { 'X-Admin-API-Key': 'test-admin-key' }
+    }, res => {
       assert.strictEqual(res.statusCode, 200);
       assert.ok(res.headers['content-type'].includes('application/json'));
       let body = '';
@@ -96,7 +104,12 @@ describe('[characterization] smoke — gateway and admin startup', function () {
 
   it('admin /schemas endpoint returns JSON', function (done) {
     const { port } = adminServer.address();
-    http.get(`http://127.0.0.1:${port}/schemas`, res => {
+    http.get({
+      hostname: '127.0.0.1',
+      port,
+      path: '/schemas',
+      headers: { 'X-Admin-API-Key': 'test-admin-key' }
+    }, res => {
       assert.strictEqual(res.statusCode, 200);
       res.resume();
       done();
