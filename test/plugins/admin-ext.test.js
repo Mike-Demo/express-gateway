@@ -33,14 +33,13 @@ describe('admin with plugins', () => {
   it('should reject unauthenticated requests', () => {
     return request(adminSrv)
       .get('/test')
-      .expect('WWW-Authenticate', 'Be' + 'arer realm="admin"')
       .expect(401);
   });
 
   it('should add custom route', () => {
     return request(adminSrv)
       .get('/test')
-      .set('Authorization', 'Be' + 'arer test-admin-key')
+      .set('X-Admin-API-Key', 'test-admin-key')
       .then(res => {
         assert.ok(res.body.enabled);
       });
@@ -54,6 +53,12 @@ describe('admin with plugins', () => {
       }
     }), /systemConfig\.adminApiKey/);
   });
+
+  it('should not expose the admin API through the default gateway pipeline', () => {
+    const gatewayConfig = require('../../lib/config').gatewayConfig;
+    assert.ok(!gatewayConfig.pipelines || !gatewayConfig.pipelines.adminAPI);
+  });
+
   it('should fire admin-ready event', () => {
     assert.ok(adminSrvFromEvent);
     assert.strictEqual(adminSrvFromEvent, adminSrv);

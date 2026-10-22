@@ -4,7 +4,7 @@ db:
     emulate: true
     namespace: EG
 
-adminApiKey: ${EG_ADMIN_API_KEY:-} # required when the admin API is enabled
+adminApiKey: ${EG_ADMIN_API_KEY:-} # required when enabled; send it in X-Admin-API-Key
 
 #plugins:
   # express-gateway-plugin-example:

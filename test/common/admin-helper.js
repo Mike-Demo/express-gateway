@@ -11,9 +11,11 @@ module.exports = function () {
   return {
     start ({ config } = {}) {
       const resolvedConfig = config || DEFAULT_CONFIG;
+      const adminApiKey = (resolvedConfig.systemConfig && resolvedConfig.systemConfig.adminApiKey) || TEST_ADMIN_API_KEY;
       resolvedConfig.systemConfig = Object.assign({}, resolvedConfig.systemConfig, {
-        adminApiKey: resolvedConfig.systemConfig && resolvedConfig.systemConfig.adminApiKey || TEST_ADMIN_API_KEY
+        adminApiKey
       });
+      require('../../lib/config').systemConfig.adminApiKey = adminApiKey;
       return rest({ config: resolvedConfig }).then((srv) => {
         this.adminSrv = srv;
         const srvInfo = srv.address();
@@ -21,7 +23,7 @@ module.exports = function () {
         const baseUrl = `http://${host}:${srvInfo.port}`;
         this.admin = adminClient({
           baseUrl,
-          headers: { Authorization: 'Be' + 'arer ' + resolvedConfig.systemConfig.adminApiKey }
+          headers: { 'X-Admin-API-Key': resolvedConfig.systemConfig.adminApiKey }
         });
         process.env.EG_ADMIN_URL = baseUrl;
         return this.adminSrv;

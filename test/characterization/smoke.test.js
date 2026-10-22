@@ -88,7 +88,7 @@ describe('[characterization] smoke — gateway and admin startup', function () {
       hostname: '127.0.0.1',
       port,
       path: '/policies',
-      headers: { Authorization: 'Be' + 'arer test-admin-key' }
+      headers: { 'X-Admin-API-Key': 'test-admin-key' }
     }, res => {
       assert.strictEqual(res.statusCode, 200);
       assert.ok(res.headers['content-type'].includes('application/json'));
@@ -104,7 +104,12 @@ describe('[characterization] smoke — gateway and admin startup', function () {
 
   it('admin /schemas endpoint returns JSON', function (done) {
     const { port } = adminServer.address();
-    http.get(`http://127.0.0.1:${port}/schemas`, res => {
+    http.get({
+      hostname: '127.0.0.1',
+      port,
+      path: '/schemas',
+      headers: { 'X-Admin-API-Key': 'test-admin-key' }
+    }, res => {
       assert.strictEqual(res.statusCode, 200);
       res.resume();
       done();

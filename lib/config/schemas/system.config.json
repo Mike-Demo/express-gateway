@@ -125,7 +125,10 @@
       "type": "object"
     },
     "adminApiKey": {
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "required": [

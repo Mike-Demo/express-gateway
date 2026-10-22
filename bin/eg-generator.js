@@ -15,7 +15,7 @@ module.exports = class EgGenerator extends Generator {
       baseUrl: this._getAdminClientBaseURL(),
       verbose: this._getAdminClientVerboseFlag(),
       headers: Object.assign(
-        adminApiKey ? { Authorization: 'Be' + 'arer ' + adminApiKey } : {},
+        adminApiKey ? { 'X-Admin-API-Key': adminApiKey } : {},
         this.argv && this.argv.H ? this.processHeaders(this.argv.H) : {}
       )
     });
