@@ -36,6 +36,13 @@ describe('admin with plugins', () => {
       .expect(401);
   });
 
+  it('should reject an invalid operator API key', () => {
+    return request(adminSrv)
+      .get('/test')
+      .set('X-Admin-API-Key', 'fake-admin-key')
+      .expect(401);
+  });
+
   it('should add custom route', () => {
     return request(adminSrv)
       .get('/test')
