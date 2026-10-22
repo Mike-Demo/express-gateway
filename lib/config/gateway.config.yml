@@ -16,11 +16,3 @@ policies:
   - proxy
   - key-auth
 pipelines:
-  adminAPI:
-    apiEndpoints:
-      - api
-    policies:
-      # - key-auth: # uncomment to enable key-auth
-      - proxy:
-          action:
-            serviceEndpoint: backend

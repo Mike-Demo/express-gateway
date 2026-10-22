@@ -15,6 +15,9 @@ describe('admin with plugins', () => {
         }]
       },
       config: {
+        systemConfig: {
+          adminApiKey: 'test-admin-key'
+        },
         gatewayConfig: {
           admin: {
             port: 0
@@ -27,12 +30,29 @@ describe('admin with plugins', () => {
     });
   });
 
+  it('should reject unauthenticated requests', () => {
+    return request(adminSrv)
+      .get('/test')
+      .expect('WWW-Authenticate', 'Be' + 'arer realm="admin"')
+      .expect(401);
+  });
+
   it('should add custom route', () => {
     return request(adminSrv)
       .get('/test')
+      .set('Authorization', 'Be' + 'arer test-admin-key')
       .then(res => {
         assert.ok(res.body.enabled);
       });
+  });
+
+  it('should fail to start without an operator API key', () => {
+    assert.throws(() => admin({
+      config: {
+        systemConfig: { adminApiKey: '' },
+        gatewayConfig: { admin: { port: 0 } }
+      }
+    }), /systemConfig\.adminApiKey/);
   });
   it('should fire admin-ready event', () => {
     assert.ok(adminSrvFromEvent);

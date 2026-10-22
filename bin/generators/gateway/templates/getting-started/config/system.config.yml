@@ -4,6 +4,8 @@ db:
     emulate: true
     namespace: EG
 
+adminApiKey: ${EG_ADMIN_API_KEY:-} # required when the admin API is enabled
+
 #plugins:
   # express-gateway-plugin-example:
   #   param1: 'param from system.config' 

@@ -28,6 +28,7 @@ module.exports.runCLICommand = function ({ adminPort, adminUrl, configDirectoryP
 
   cliExecOptions.env.EG_CONFIG_DIR = configDirectoryPath;
   cliExecOptions.env.EG_ADMIN_URL = adminUrl || `http://localhost:${adminPort}`;
+  cliExecOptions.env.EG_ADMIN_API_KEY = 'test-admin-key';
   const command = ['node', modulePath].concat(cliArgs).join(' ');
   return new Promise((resolve, reject) => {
     exec(command, cliExecOptions, (err, stdout) => {

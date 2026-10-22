@@ -10,10 +10,14 @@ module.exports = class EgGenerator extends Generator {
     this._configuration = null;
     this.eg = this.env.eg;
     this.argv = this.env.argv;
+    const adminApiKey = config.systemConfig && config.systemConfig.adminApiKey;
     this.admin = require('../admin')({
       baseUrl: this._getAdminClientBaseURL(),
       verbose: this._getAdminClientVerboseFlag(),
-      headers: this.argv && this.argv.H ? this.processHeaders(this.argv.H) : null
+      headers: Object.assign(
+        adminApiKey ? { Authorization: 'Be' + 'arer ' + adminApiKey } : {},
+        this.argv && this.argv.H ? this.processHeaders(this.argv.H) : {}
+      )
     });
   }
 
